@@ -6,6 +6,7 @@
   <script src="lib/jquery.min.js"></script>
   <script src="lib/jquery.ui.widget.js"></script>
   <script src="lib/jquery.iframe-transport.js"></script>
+  <script src="lib/jquery-transforms.js"></script>
   <script src="lib/jquery.fileupload.js"></script>
   <style type="text/css">
     #progress {
@@ -45,6 +46,9 @@
         transition: all 0.3s ease-out;
         opacity: 1;
     }
+    img {
+      position: absolute;
+    }
   </style>
 </head>
 <body>
@@ -55,10 +59,45 @@
 </div>
 <div id="files" class="files"></div>
 <script>
+
+
+function addImage(name) {
+  var img = $('<img/>').attr('src', 'uploads/medium/' + name);
+  img.appendTo('#files');
+  img.hide();
+  img.bind('load', function() {
+    var pos = localStorage['img_' + name];
+    if (pos) {
+       pos = JSON.parse(pos);
+       $(img).translate(pos.x - img.width()/2, pos.y - img.height())
+    }
+    else {
+      $(img).translate(window.innerWidth/2 - img.width()/2, window.innerHeight/2 - img.height())
+    }
+    img.show();
+  })
+
+  function onmouseup() {
+    window.removeEventListener('mouseup', onmouseup);
+    window.removeEventListener('mousemove', onmousemove);
+  }
+
+  function onmousemove(e) {
+    localStorage['img_' + name] = JSON.stringify({ x: e.clientX, y: e.clientY });
+    $(img).translate(e.clientX - img.width()/2, e.clientY - img.height())
+  }
+
+  img.bind('mousedown', function(e) {
+    window.addEventListener('mouseup', onmouseup);
+    window.addEventListener('mousemove', onmousemove);
+    e.preventDefault()
+  })
+}
+
 $.get('/list', function(images) {
   Object.keys(images).forEach(function(imageName) {
     if (imageName[0] == '.') return;
-    $('<img/>').attr('src', 'uploads/medium/' + imageName).prependTo('#files');
+    addImage(imageName);
   })
 })
 $('#fileupload').fileupload({
@@ -67,7 +106,7 @@ $('#fileupload').fileupload({
     //dropZone: $('#dropzone'),
     done: function (e, data) {
         $.each(data.result.files, function (index, file) {
-            $('<img/>').attr('src', 'uploads/medium/' + file.name).prependTo('#files');
+            addImage(file.name);
         });
     },
     progressall: function (e, data) {
@@ -78,10 +117,7 @@ $('#fileupload').fileupload({
         );
     }
 })
-$(document).bind('drop dragover', function (e) {
-    // Prevent the default browser drop action:
-    e.preventDefault();
-});
+
 $(document).bind('drop', function (e) {
     var url = e.originalEvent.dataTransfer.getData('text/uri-list');
     if (url) {
