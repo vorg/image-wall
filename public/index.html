@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Images</title>
+  <script src="lib/jquery.min.js"></script>
+  <script src="lib/jquery.ui.widget.js"></script>
+  <script src="lib/jquery.iframe-transport.js"></script>
+  <script src="lib/jquery.fileupload.js"></script>
+  <style type="text/css">
+    #progress {
+      width: 400px;
+      margin-top: 10px;
+      height: 10px;
+      background: #95a5a6;
+    }
+    .progress-bar {
+      height: 10px;
+      width: 0%;
+      background: #1abc9c;
+    }
+  </style>
+</head>
+<body>
+<input id="fileupload" type="file" name="files[]" data-url="/upload" multiple>
+<div id="progress" class="progress">
+  <div class="progress-bar progress-bar-success"></div>
+</div>
+<div id="files" class="files"></div>
+<script>
+$('#fileupload').fileupload({
+    url: '/upload',
+    dataType: 'json',
+    done: function (e, data) {
+        $.each(data.result.files, function (index, file) {
+            $('<img/>').attr('src', 'uploads/thumbnail/' + file.name).appendTo('#files');
+        });
+    },
+    progressall: function (e, data) {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        $('#progress .progress-bar').css(
+            'width',
+            progress + '%'
+        );
+    }
+})
+</script>
+</body>
+</html>
