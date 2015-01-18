@@ -153,12 +153,13 @@
 		} else {
 			var translateValue = this.transform(TRANSLATE_TRANSFORM.substr(0, TRANSLATE_TRANSFORM.indexOf('(')));
 			translateValue = translateValue.substr(1, translateValue.indexOf(')') - 1);
+			console.log(translateValue)
 			xy = translateValue.match(/[-]?[\d]*[.]?[\d]/gi);
 			return {
 				x: Number(xy[0]),
 				left: Number(xy[0]),
-				y: Number(xy[1]),
-				top: Number(xy[1]),
+				y: Number(xy[2]),
+				top: Number(xy[2]),
 				unit: 'px'
 			};
 		}

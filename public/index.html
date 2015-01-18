@@ -121,19 +121,19 @@ function addImage(name) {
 
   function onmousemove(e) {
     var pos = windowToLocal(e.clientX, e.clientY);
-    var x = pos.x;
-    var y = pos.y;
+    var x = pos.x - dx;
+    var y = pos.y - dy;
     localStorage['img_' + name] = JSON.stringify({ x: x, y: y });
     $(img).translate(x - img.width()/2, y - img.height()/2)
   }
 
   img.bind('mousedown', function(e) {
-    var x = (e.clientX - window.innerWidth/2) / scale;// + window.innerWidth/2;
-    var y = (e.clientY - window.innerHeight/2) / scale;// + window.innerHeight/2;
-    var ix = $(img).translate().left / scale;
-    var iy = $(img).translate().top / scale;
-    //dx = ix - x;
-    //dy = iy - y;
+    var pos = windowToLocal(e.clientX, e.clientY);
+    var translate = $(img).translate();
+    var ix = Number(translate.left);
+    var iy = Number(translate.top);
+    dx = pos.x - ix - img.width()/2;
+    dy = pos.y - iy - img.height()/2;
     $(img).addClass('selected');
     window.addEventListener('mouseup', onmouseup);
     window.addEventListener('mousemove', onmousemove);
