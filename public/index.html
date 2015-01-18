@@ -7,6 +7,7 @@
   <script src="lib/jquery.ui.widget.js"></script>
   <script src="lib/jquery.iframe-transport.js"></script>
   <script src="lib/jquery-transforms.js"></script>
+  <script src="lib/jquery-mousewheel.js"></script>
   <script src="lib/jquery.fileupload.js"></script>
   <style type="text/css">
     #progress {
@@ -46,6 +47,9 @@
         transition: all 0.3s ease-out;
         opacity: 1;
     }
+    #files {
+      position: absolute;
+    }
     img {
       position: absolute;
     }
@@ -60,6 +64,16 @@
 <div id="files" class="files"></div>
 <script>
 
+var scale = 1;
+$('#files').scale(scale);
+$('#files').origin(window.innerWidth/2, window.innerHeight/3)
+
+$(window).mousewheel(function(e) {
+  scale -= event.deltaY / 1000;
+  if (scale < 0.02) scale = 0.02;
+  $('#files').scale(scale);
+  e.preventDefault();
+});
 
 function addImage(name) {
   var img = $('<img/>').attr('src', 'uploads/medium/' + name);
@@ -83,8 +97,10 @@ function addImage(name) {
   }
 
   function onmousemove(e) {
-    localStorage['img_' + name] = JSON.stringify({ x: e.clientX, y: e.clientY });
-    $(img).translate(e.clientX - img.width()/2, e.clientY - img.height())
+    var x = (e.clientX - window.innerWidth/2) / scale + window.innerWidth/2;
+    var y = (e.clientY - window.innerHeight/2) / scale + window.innerHeight/2;
+    localStorage['img_' + name] = JSON.stringify({ x: x, y: y });
+    $(img).translate(x - img.width()/2, y - img.height()/2)
   }
 
   img.bind('mousedown', function(e) {
@@ -93,6 +109,8 @@ function addImage(name) {
     e.preventDefault()
   })
 }
+
+window
 
 $.get('/list', function(images) {
   Object.keys(images).forEach(function(imageName) {
