@@ -11,6 +11,7 @@
     #progress {
       width: 400px;
       margin-top: 10px;
+      margin-bottom: 10px;
       height: 10px;
       background: #95a5a6;
     }
@@ -19,9 +20,35 @@
       width: 0%;
       background: #1abc9c;
     }
+    #dropzone {
+        background: #95a5a6;
+        color: white;
+        font-family: sans-serif;
+        margin-bottom: 10px;
+        width: 150px;
+        height: 50px;
+        line-height: 50px;
+        text-align: center;
+        font-weight: bold;
+    }
+    #dropzone.in {
+      background: #e67e22;
+    }
+    #dropzone.hover {
+        background: #e74c3c;
+    }
+    #dropzone.fade {
+        -webkit-transition: all 0.3s ease-out;
+        -moz-transition: all 0.3s ease-out;
+        -ms-transition: all 0.3s ease-out;
+        -o-transition: all 0.3s ease-out;
+        transition: all 0.3s ease-out;
+        opacity: 1;
+    }
   </style>
 </head>
 <body>
+<div id="dropzone" class="fade well">Drop files here</div>
 <input id="fileupload" type="file" name="files[]" data-url="/upload" multiple>
 <div id="progress" class="progress">
   <div class="progress-bar progress-bar-success"></div>
@@ -31,15 +58,16 @@
 $.get('/list', function(images) {
   Object.keys(images).forEach(function(imageName) {
     if (imageName[0] == '.') return;
-    $('<img/>').attr('src', 'uploads/medium/' + imageName).appendTo('#files');
+    $('<img/>').attr('src', 'uploads/medium/' + imageName).prependTo('#files');
   })
 })
 $('#fileupload').fileupload({
     url: '/upload',
     dataType: 'json',
+    dropZone: $('#dropzone'),
     done: function (e, data) {
         $.each(data.result.files, function (index, file) {
-            $('<img/>').attr('src', 'uploads/medium/' + file.name).appendTo('#files');
+            $('<img/>').attr('src', 'uploads/medium/' + file.name).prependTo('#files');
         });
     },
     progressall: function (e, data) {
@@ -50,6 +78,33 @@ $('#fileupload').fileupload({
         );
     }
 })
+$(document).bind('dragover', function (e) {
+    var dropZone = $('#dropzone'),
+        timeout = window.dropZoneTimeout;
+    if (!timeout) {
+        dropZone.addClass('in');
+    } else {
+        clearTimeout(timeout);
+    }
+    var found = false,
+        node = e.target;
+    do {
+        if (node === dropZone[0]) {
+            found = true;
+            break;
+        }
+        node = node.parentNode;
+    } while (node != null);
+    if (found) {
+        dropZone.addClass('hover');
+    } else {
+        dropZone.removeClass('hover');
+    }
+    window.dropZoneTimeout = setTimeout(function () {
+        window.dropZoneTimeout = null;
+        dropZone.removeClass('in hover');
+    }, 100);
+});
 </script>
 </body>
 </html>
