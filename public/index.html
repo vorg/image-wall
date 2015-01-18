@@ -28,12 +28,18 @@
 </div>
 <div id="files" class="files"></div>
 <script>
+$.get('/list', function(images) {
+  Object.keys(images).forEach(function(imageName) {
+    if (imageName[0] == '.') return;
+    $('<img/>').attr('src', 'uploads/low/' + imageName).appendTo('#files');
+  })
+})
 $('#fileupload').fileupload({
     url: '/upload',
     dataType: 'json',
     done: function (e, data) {
         $.each(data.result.files, function (index, file) {
-            $('<img/>').attr('src', 'uploads/thumbnail/' + file.name).appendTo('#files');
+            $('<img/>').attr('src', 'uploads/low/' + file.name).appendTo('#files');
         });
     },
     progressall: function (e, data) {
