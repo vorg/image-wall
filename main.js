@@ -9,9 +9,13 @@ upload.configure({
   uploadDir: __dirname + '/public/uploads',
   uploadUrl: '/uploads',
   imageVersions: {
-    thumbnail: {
+    thumbs: {
       width: 80,
       height: 80
+    },
+    medium: {
+      width: 320,
+      height: 800
     }
   }
 });

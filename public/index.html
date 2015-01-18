@@ -31,7 +31,7 @@
 $.get('/list', function(images) {
   Object.keys(images).forEach(function(imageName) {
     if (imageName[0] == '.') return;
-    $('<img/>').attr('src', 'uploads/low/' + imageName).appendTo('#files');
+    $('<img/>').attr('src', 'uploads/medium/' + imageName).appendTo('#files');
   })
 })
 $('#fileupload').fileupload({
@@ -39,7 +39,7 @@ $('#fileupload').fileupload({
     dataType: 'json',
     done: function (e, data) {
         $.each(data.result.files, function (index, file) {
-            $('<img/>').attr('src', 'uploads/low/' + file.name).appendTo('#files');
+            $('<img/>').attr('src', 'uploads/medium/' + file.name).appendTo('#files');
         });
     },
     progressall: function (e, data) {
