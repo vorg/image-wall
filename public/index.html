@@ -64,7 +64,7 @@ $.get('/list', function(images) {
 $('#fileupload').fileupload({
     url: '/upload',
     dataType: 'json',
-    dropZone: $('#dropzone'),
+    //dropZone: $('#dropzone'),
     done: function (e, data) {
         $.each(data.result.files, function (index, file) {
             $('<img/>').attr('src', 'uploads/medium/' + file.name).prependTo('#files');
@@ -78,6 +78,17 @@ $('#fileupload').fileupload({
         );
     }
 })
+$(document).bind('drop dragover', function (e) {
+    // Prevent the default browser drop action:
+    e.preventDefault();
+});
+$(document).bind('drop', function (e) {
+    var url = e.originalEvent.dataTransfer.getData('text/uri-list');
+    if (url) {
+      //upload somehow
+    }
+});
+
 $(document).bind('dragover', function (e) {
     var dropZone = $('#dropzone'),
         timeout = window.dropZoneTimeout;
@@ -104,6 +115,7 @@ $(document).bind('dragover', function (e) {
         window.dropZoneTimeout = null;
         dropZone.removeClass('in hover');
     }, 100);
+    e.preventDefault();
 });
 </script>
 </body>
