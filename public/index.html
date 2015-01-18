@@ -49,24 +49,36 @@
     }
     #files {
       position: absolute;
+      top: 0;
+      left: 0;
+      border: 10px solid red;
+      xtop: 288px;
+      xleft: 500px;
     }
     img {
       position: absolute;
     }
+    .selected {
+      border: 10px solid red;
+    }
   </style>
 </head>
 <body>
+<div id="files" class="files"></div>
 <div id="dropzone" class="fade well">Drop files here</div>
 <input id="fileupload" type="file" name="files[]" data-url="/upload" multiple>
 <div id="progress" class="progress">
   <div class="progress-bar progress-bar-success"></div>
 </div>
-<div id="files" class="files"></div>
 <script>
 
 var scale = 1;
 $('#files').scale(scale);
-$('#files').origin(window.innerWidth/2, window.innerHeight/3)
+$('#files').translate($(window).width()/2, $(window).height()/2)
+$('#files').origin($(window).width()/2, $(window).height()/2)
+
+//$('#files').translate(500, 288)
+//$('#files').origin(window.innerWidth/2, window.innerHeight/2)
 
 $(window).mousewheel(function(e) {
   scale -= event.deltaY / 1000;
@@ -83,27 +95,46 @@ function addImage(name) {
     var pos = localStorage['img_' + name];
     if (pos) {
        pos = JSON.parse(pos);
-       $(img).translate(pos.x - img.width()/2, pos.y - img.height())
+       $(img).translate(pos.x - img.width()/2, pos.y)
     }
     else {
-      $(img).translate(window.innerWidth/2 - img.width()/2, window.innerHeight/2 - img.height())
+      //$(img).translate(window.innerWidth/2 - img.width()/2, window.innerHeight/2 - img.height())
     }
     img.show();
   })
 
+  var dx = 0;
+  var dy = 0;
+
+  function windowToLocal(x, y) {
+    return {
+      x: (x - $(window).width()/2) / scale,
+      y: (y - $(window).height()/2) / scale
+    }
+  }
+
   function onmouseup() {
     window.removeEventListener('mouseup', onmouseup);
     window.removeEventListener('mousemove', onmousemove);
+    $(img).removeClass('selected');
   }
 
   function onmousemove(e) {
-    var x = (e.clientX - window.innerWidth/2) / scale + window.innerWidth/2;
-    var y = (e.clientY - window.innerHeight/2) / scale + window.innerHeight/2;
+    var pos = windowToLocal(e.clientX, e.clientY);
+    var x = pos.x;
+    var y = pos.y;
     localStorage['img_' + name] = JSON.stringify({ x: x, y: y });
     $(img).translate(x - img.width()/2, y - img.height()/2)
   }
 
   img.bind('mousedown', function(e) {
+    var x = (e.clientX - window.innerWidth/2) / scale;// + window.innerWidth/2;
+    var y = (e.clientY - window.innerHeight/2) / scale;// + window.innerHeight/2;
+    var ix = $(img).translate().left / scale;
+    var iy = $(img).translate().top / scale;
+    //dx = ix - x;
+    //dy = iy - y;
+    $(img).addClass('selected');
     window.addEventListener('mouseup', onmouseup);
     window.addEventListener('mousemove', onmousemove);
     e.preventDefault()
